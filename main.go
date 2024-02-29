@@ -21,10 +21,16 @@ var datas = []Data{
 
 func main() {
 	fmt.Printf("http://localhost:8080/person \n\n")
+	r := setupRouter()
+	r.Run(":8080")
+}
+
+func setupRouter() *gin.Engine {
 	r := gin.Default()
 	r.GET("/person", getDatas)
 	r.POST("/person", postDatas)
-	r.Run(":8080")
+
+	return r
 }
 
 func getDatas(c *gin.Context) {
@@ -33,6 +39,11 @@ func getDatas(c *gin.Context) {
 
 func postDatas(c *gin.Context) {
 	var newDatas Data
+	err := c.BindJSON(&newDatas)
+	if err != nil {
+		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
 	datas = append(datas, newDatas)
 	c.IndentedJSON(http.StatusCreated, newDatas)
 }
