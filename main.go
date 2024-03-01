@@ -28,13 +28,27 @@ func main() {
 func setupRouter() *gin.Engine {
 	r := gin.Default()
 	r.GET("/person", getDatas)
+	r.GET("/person/:id", getDataById)
 	r.POST("/person", postDatas)
+	r.DELETE("/person/:id", deleteDataById)
 
 	return r
 }
 
 func getDatas(c *gin.Context) {
 	c.IndentedJSON(http.StatusOK, datas)
+}
+
+func getDataById(c *gin.Context) {
+	id := c.Param("id")
+	// fmt.Fprintf(c.Writer, `<script>alert('%s');</script>`, id)
+	for _, e := range datas {
+		if e.ID == id {
+			c.IndentedJSON(http.StatusOK, e)
+			return
+		}
+	}
+	c.IndentedJSON(http.StatusNotFound, gin.H{"message": "datas not found"})
 }
 
 func postDatas(c *gin.Context) {
@@ -46,4 +60,9 @@ func postDatas(c *gin.Context) {
 	}
 	datas = append(datas, newDatas)
 	c.IndentedJSON(http.StatusCreated, newDatas)
+}
+
+func deleteDataById(c *gin.Context) {
+	id := c.Param("id")
+	c.IndentedJSON(http.StatusOK, id)
 }
