@@ -20,17 +20,17 @@ var datas = []Data{
 }
 
 func main() {
-	fmt.Printf("http://localhost:8080/person \n\n")
+	fmt.Printf("http://localhost:8080/ \n\n")
 	r := setupRouter()
 	r.Run(":8080")
 }
 
 func setupRouter() *gin.Engine {
 	r := gin.Default()
-	r.GET("/person", getDatas)
-	r.GET("/person/:id", getDataById)
-	r.POST("/person", postDatas)
-	r.DELETE("/person/:id", deleteDataById)
+	r.GET("/", getDatas)
+	r.GET("/:id", getDataById)
+	r.POST("/", postDatas)
+	r.DELETE("/:id", deleteDataById)
 
 	return r
 }
@@ -64,5 +64,12 @@ func postDatas(c *gin.Context) {
 
 func deleteDataById(c *gin.Context) {
 	id := c.Param("id")
+  for i, e := range datas {
+    if e.ID == id {
+      datas = append(datas[:i], datas[i+1:]...)
+      c.IndentedJSON(http.StatusOK, e)
+      return
+    }
+  }
 	c.IndentedJSON(http.StatusOK, id)
 }
